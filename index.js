@@ -29,6 +29,7 @@ async function run() {
     await client.connect();
 
     const classesCollection = client.db("martialDb").collection("classes");
+    const selectCollection = client.db("martialDb").collection("select");
     const instructorCollection = client.db("martialDb").collection("Instructors");
 
     app.get('/classes', async (req, res) => {
@@ -57,6 +58,13 @@ async function run() {
 
     app.get('/all-instructors', async(req, res)=>{
       const result = await instructorCollection.find().toArray()
+      res.send(result)
+    })
+
+
+    app.post('/select', async(req, res)=> {
+      const select = req.body
+      const result = await selectCollection.insertOne(select)
       res.send(result)
     })
 
