@@ -29,9 +29,24 @@ async function run() {
     await client.connect();
 
     const classesCollection = client.db("martialDb").collection("classes");
+    const instructorCollection = client.db("martialDb").collection("Instructors");
 
-    app.get('/classes', async(req, res)=>{
-        const result = await classesCollection.find().toArray()
+    app.get('/classes', async (req, res) => {
+      const query = {};
+      const options = {
+        sort: { "totalSeats": -1 },
+      };
+      const result = await classesCollection.find(query, options).limit(6).toArray()
+      res.send(result)
+    })
+
+
+    app.get('/instructor', async(req, res)=>{
+      const query = {}
+        const options = {
+          sort: { "numClassesTaken": -1 },
+        };
+        const result = await instructorCollection.find(query, options).limit(6).toArray()
         res.send(result)
     })
 
@@ -50,10 +65,10 @@ run().catch(console.dir);
 
 
 
-app.get('/', (req, res)=>{
-    res.send('Martial is Running')
+app.get('/', (req, res) => {
+  res.send('Martial is Running')
 })
 
-app.listen(port, ()=>{
-    console.log(`Martial Mastery is Running on ${port}`)
+app.listen(port, () => {
+  console.log(`Martial Mastery is Running on ${port}`)
 })
