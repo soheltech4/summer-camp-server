@@ -28,9 +28,27 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const usersCollection = client.db("martialDb").collection("users");
     const classesCollection = client.db("martialDb").collection("classes");
     const selectCollection = client.db("martialDb").collection("select");
     const instructorCollection = client.db("martialDb").collection("Instructors");
+
+    app.get('/users',  async(req, res)=> {
+      const result = await usersCollection.find().toArray()
+      res.send(result)
+    })
+
+
+    app.post('/users', async(req, res)=>{
+      const user = req.body
+      const query = {email : user.email}
+      const existingUser = await usersCollection.findOne(query)
+      if(existingUser){
+        return res.send({message : 'user already login'})
+      }
+      const result = await usersCollection.insertOne(user)
+      res.send(result)
+    })
 
     app.get('/classes', async (req, res) => {
       const query = {};
