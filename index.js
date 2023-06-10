@@ -11,7 +11,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rbfkgiq.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -47,24 +47,40 @@ async function run() {
     })
 
 
-    app.get('/instructor', async(req, res)=>{
+    app.get('/instructor', async (req, res) => {
       const query = {}
-        const options = {
-          sort: { "numClassesTaken": -1 },
-        };
-        const result = await instructorCollection.find(query, options).limit(6).toArray()
-        res.send(result)
+      const options = {
+        sort: { "numClassesTaken": -1 },
+      };
+      const result = await instructorCollection.find(query, options).limit(6).toArray()
+      res.send(result)
     })
 
-    app.get('/all-instructors', async(req, res)=>{
+    app.get('/all-instructors', async (req, res) => {
       const result = await instructorCollection.find().toArray()
       res.send(result)
     })
 
+    app.get('/select', async (req, res) => {
+      const email = req.query.email
+      if (!email) {
+        res.send([])
+      }
+      const query = { email: email }
+      const result = await selectCollection.find(query).toArray()
+      res.send(result)
+    })
 
-    app.post('/select', async(req, res)=> {
+    app.post('/select', async (req, res) => {
       const select = req.body
       const result = await selectCollection.insertOne(select)
+      res.send(result)
+    })
+
+    app.delete('/select/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await selectCollection.deleteOne(query)
       res.send(result)
     })
 
